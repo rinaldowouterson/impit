@@ -210,9 +210,7 @@ jobs:
           arch: ${{ matrix.platform.target }}
           distro: alpine_latest
           githubToken: ${{ github.token }}
-          dockerRunArgs: -v ${{ github.workspace }}:/io -w /io/impit-python
-          env: |
-            APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
+          dockerRunArgs: -v ${{ github.workspace }}:/io -w /io/impit-python -e APIFY_HTTPBIN_TOKEN=${{ secrets.APIFY_HTTPBIN_TOKEN }}
           install: |
             apk add py3-virtualenv
           run: |
