@@ -3,18 +3,19 @@ name: "[impit-python] Test & Build"
 on:
   push:
     branches:
-        - "master"
+      - "master"
+      - "chore/*-sandbox"
     tags:
-        - "py-*"
+      - "py-*"
     paths:
-        - "impit-python/**"
-        - "impit/**"
-        - 'Cargo.*'
+      - "impit-python/**"
+      - "impit/**"
+      - "Cargo.*"
   pull_request:
     paths:
-        - 'impit-python/**'
-        - 'impit/**'
-        - 'Cargo.*'
+      - "impit-python/**"
+      - "impit/**"
+      - "Cargo.*"
   workflow_dispatch:
   workflow_call:
     inputs:
@@ -133,7 +134,7 @@ jobs:
         shell: bash
         working-directory: impit-python
         env:
-            APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
+          APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
         run: |
           set -e
           uv venv
@@ -266,7 +267,7 @@ jobs:
         shell: bash
         working-directory: impit-python
         env:
-            APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
+          APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
         run: |
           uv venv
           source .venv/Scripts/activate
@@ -319,7 +320,7 @@ jobs:
       - name: pytest
         working-directory: impit-python
         env:
-            APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
+          APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
         run: |
           uv venv
           source .venv/bin/activate

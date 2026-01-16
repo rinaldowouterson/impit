@@ -2,24 +2,29 @@ name: "[impit-node] Test & Build"
 env:
   DEBUG: napi:*
   APP_NAME: impit-node
-  MACOSX_DEPLOYMENT_TARGET: '10.13'
-  RUSTFLAGS: '--cfg reqwest_unstable'
+  MACOSX_DEPLOYMENT_TARGET: "10.13"
+  RUSTFLAGS: "--cfg reqwest_unstable"
 permissions:
   contents: write
   id-token: write
-'on':
+"on":
   push:
     branches:
       - master
+      - "chore/*-sandbox"
     tags-ignore:
-      - '**'
+      - "**"
     paths:
-      - 'impit-node/**'
+      - "impit-node/**"
+      - "impit/**"
+      - "Cargo.lock"
+      - ".github/workflows/node-test.yaml"
   pull_request:
     paths:
-      - 'impit-node/**'
-      - 'impit/**'
-      - '.github/workflows/node-test.yaml'
+      - "impit-node/**"
+      - "impit/**"
+      - "Cargo.lock"
+      - ".github/workflows/node-test.yaml"
   workflow_call:
 
 jobs:
@@ -44,16 +49,16 @@ jobs:
             target: aarch64-unknown-linux-musl
             docker: arm64v8/node:20-alpine
             build: |-
-                export PATH="/usr/local/cargo/bin/rustup:/root/.cargo/bin:$PATH" RUSTFLAGS="-C target-feature=-crt-static --cfg reqwest_unstable" CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=gcc CC=gcc CXX="g++" GN_EXE=gn &&
-                apk add --update --no-cache bash wget cmake musl-dev clang llvm build-base python3 gcc g++ perl &&
-                sed -i -e 's/v[[:digit:]]\..*\//edge\//g' /etc/apk/repositories &&
-                apk add --update --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing rustup git gn tar ninja &&
-                apk update &&
-                apk upgrade &&
-                rustup-init -y &&
-                yarn global add pnpm lerna &&
-                corepack enable &&
-                yarn --cwd impit-node build
+              export PATH="/usr/local/cargo/bin/rustup:/root/.cargo/bin:$PATH" RUSTFLAGS="-C target-feature=-crt-static --cfg reqwest_unstable" CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=gcc CC=gcc CXX="g++" GN_EXE=gn &&
+              apk add --update --no-cache bash wget cmake musl-dev clang llvm build-base python3 gcc g++ perl &&
+              sed -i -e 's/v[[:digit:]]\..*\//edge\//g' /etc/apk/repositories &&
+              apk add --update --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing rustup git gn tar ninja &&
+              apk update &&
+              apk upgrade &&
+              rustup-init -y &&
+              yarn global add pnpm lerna &&
+              corepack enable &&
+              yarn --cwd impit-node build
           - host: ubuntu-22.04-arm
             target: aarch64-unknown-linux-gnu
             build: yarn --cwd impit-node build --target aarch64-unknown-linux-gnu --use-napi-cross
@@ -62,24 +67,24 @@ jobs:
             docker: node:20-alpine
             # Script taken from https://github.com/napi-rs/napi-rs/blob/main/alpine.Dockerfile
             build: |
-                export PATH="/aarch64-linux-musl-cross/bin:/usr/local/cargo/bin/rustup:/root/.cargo/bin:$PATH" RUSTFLAGS="-C target-feature=-crt-static --cfg reqwest_unstable" CC="clang" CXX="clang++" GN_EXE=gn &&
-                apk add --update --no-cache bash wget cmake musl-dev clang llvm build-base python3 &&
-                sed -i -e 's/v[[:digit:]]\..*\//edge\//g' /etc/apk/repositories &&
-                apk add --update --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing rustup git gn tar ninja &&
-                apk update &&
-                apk upgrade &&
-                rustup-init -y &&
-                yarn global add pnpm lerna &&
-                rustup target add aarch64-unknown-linux-musl &&
-                wget https://github.com/napi-rs/napi-rs/releases/download/linux-musl-cross%4010/aarch64-linux-musl-cross.tgz &&
-                tar -xvf aarch64-linux-musl-cross.tgz &&
-                rm aarch64-linux-musl-cross.tgz &&
-                apk add perl &&
-                ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/crtbeginS.o /usr/lib/crtbeginS.o &&
-                ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/crtendS.o /usr/lib/crtendS.o &&
-                ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/libgcc.a /usr/lib/libgcc.a &&
-                corepack enable &&
-                yarn --cwd impit-node build --target x86_64-unknown-linux-musl
+              export PATH="/aarch64-linux-musl-cross/bin:/usr/local/cargo/bin/rustup:/root/.cargo/bin:$PATH" RUSTFLAGS="-C target-feature=-crt-static --cfg reqwest_unstable" CC="clang" CXX="clang++" GN_EXE=gn &&
+              apk add --update --no-cache bash wget cmake musl-dev clang llvm build-base python3 &&
+              sed -i -e 's/v[[:digit:]]\..*\//edge\//g' /etc/apk/repositories &&
+              apk add --update --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing rustup git gn tar ninja &&
+              apk update &&
+              apk upgrade &&
+              rustup-init -y &&
+              yarn global add pnpm lerna &&
+              rustup target add aarch64-unknown-linux-musl &&
+              wget https://github.com/napi-rs/napi-rs/releases/download/linux-musl-cross%4010/aarch64-linux-musl-cross.tgz &&
+              tar -xvf aarch64-linux-musl-cross.tgz &&
+              rm aarch64-linux-musl-cross.tgz &&
+              apk add perl &&
+              ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/crtbeginS.o /usr/lib/crtbeginS.o &&
+              ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/crtendS.o /usr/lib/crtendS.o &&
+              ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/libgcc.a /usr/lib/libgcc.a &&
+              corepack enable &&
+              yarn --cwd impit-node build --target x86_64-unknown-linux-musl
           - host: macos-latest
             target: aarch64-apple-darwin
             build: yarn --cwd impit-node build --target aarch64-apple-darwin
@@ -151,7 +156,7 @@ jobs:
         if: ${{ matrix.settings.docker }}
         with:
           image: ${{ matrix.settings.docker }}
-          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          options: "--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build"
           run: ${{ matrix.settings.build }}
       - name: Build
         run: ${{ matrix.settings.build }}
@@ -176,8 +181,8 @@ jobs:
           - host: windows-latest
             target: x86_64-pc-windows-msvc
         node:
-          - '20'
-          - '22'
+          - "20"
+          - "22"
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v6
@@ -195,8 +200,8 @@ jobs:
       - name: Activate cache for Node.js
         uses: actions/setup-node@v6
         with:
-            cache: yarn
-            cache-dependency-path: impit-node/yarn.lock
+          cache: yarn
+          cache-dependency-path: impit-node/yarn.lock
 
       - name: Install dependencies
         run: yarn --cwd impit-node install
@@ -210,7 +215,7 @@ jobs:
         shell: bash
       - name: Test bindings
         env:
-            APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
+          APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
         run: yarn --cwd impit-node test
   test-linux-x64-gnu-binding:
     name: Test bindings on Linux-x64-gnu - node@${{ matrix.node }}
@@ -220,8 +225,8 @@ jobs:
       fail-fast: false
       matrix:
         node:
-          - '20'
-          - '22'
+          - "20"
+          - "22"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -238,8 +243,8 @@ jobs:
       - name: Activate cache for Node.js
         uses: actions/setup-node@v6
         with:
-            cache: yarn
-            cache-dependency-path: impit-node/yarn.lock
+          cache: yarn
+          cache-dependency-path: impit-node/yarn.lock
       - name: Install dependencies
         run: yarn --cwd impit-node install
       - name: Download artifacts
@@ -261,8 +266,8 @@ jobs:
       fail-fast: false
       matrix:
         node:
-          - '20'
-          - '22'
+          - "20"
+          - "22"
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v6
@@ -279,8 +284,8 @@ jobs:
       - name: Activate cache for Node.js
         uses: actions/setup-node@v6
         with:
-            cache: yarn
-            cache-dependency-path: impit-node/yarn.lock
+          cache: yarn
+          cache-dependency-path: impit-node/yarn.lock
 
       - name: Install dependencies
         run: yarn --cwd impit-node install
@@ -294,7 +299,7 @@ jobs:
         shell: bash
       - name: Test bindings
         env:
-            APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
+          APIFY_HTTPBIN_TOKEN: ${{ secrets.APIFY_HTTPBIN_TOKEN }}
         run: yarn --cwd impit-node test
 
   test-linux-aarch64-musl-binding:
@@ -305,8 +310,8 @@ jobs:
       fail-fast: false
       matrix:
         node:
-          - '20'
-          - '22'
+          - "20"
+          - "22"
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v6
@@ -323,8 +328,8 @@ jobs:
       - name: Activate cache for Node.js
         uses: actions/setup-node@v6
         with:
-            cache: yarn
-            cache-dependency-path: impit-node/yarn.lock
+          cache: yarn
+          cache-dependency-path: impit-node/yarn.lock
 
       - name: Download artifacts
         uses: actions/download-artifact@v7
@@ -346,8 +351,8 @@ jobs:
       fail-fast: false
       matrix:
         node:
-          - '20'
-          - '22'
+          - "20"
+          - "22"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -364,8 +369,8 @@ jobs:
       - name: Activate cache for Node.js
         uses: actions/setup-node@v6
         with:
-            cache: yarn
-            cache-dependency-path: impit-node/yarn.lock
+          cache: yarn
+          cache-dependency-path: impit-node/yarn.lock
 
       - name: Download artifacts
         uses: actions/download-artifact@v7
@@ -378,4 +383,3 @@ jobs:
       - name: Test bindings
         run: |
           docker run -e CI=1 -e APIFY_HTTPBIN_TOKEN=${{ secrets.APIFY_HTTPBIN_TOKEN }} --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-alpine sh -c "corepack enable && yarn --cwd impit-node install && yarn --cwd impit-node test"
-
