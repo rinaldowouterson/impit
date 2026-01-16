@@ -92,7 +92,7 @@ jobs:
               "x86" | "x86_64")
                 # NOTE: rust-cross/manylinux docker images are CentOS based
                 yum update -y
-                yum install -y openssl openssl-devel perl perl-IPC-Cmd
+                yum install -y openssl openssl-devel perl perl-IPC-Cmd perl-core
                 ;;
             esac
 
