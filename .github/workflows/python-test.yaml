@@ -11,11 +11,13 @@ on:
       - "impit-python/**"
       - "impit/**"
       - "Cargo.*"
+      - ".github/workflows/python-test.yaml"
   pull_request:
     paths:
       - "impit-python/**"
       - "impit/**"
       - "Cargo.*"
+      - ".github/workflows/python-test.yaml"
   workflow_dispatch:
   workflow_call:
     inputs:
